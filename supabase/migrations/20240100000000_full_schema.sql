@@ -389,90 +389,90 @@ ALTER TABLE requisitions            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE req_pipeline            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_matches              ENABLE ROW LEVEL SECURITY;
 
--- Helper: extract role from JWT user_metadata
-CREATE OR REPLACE FUNCTION auth.user_role()
+-- Helper: extract role from JWT user_metadata (must live in public, not auth)
+CREATE OR REPLACE FUNCTION public.user_role()
 RETURNS TEXT AS $$
   SELECT COALESCE(
     (auth.jwt() -> 'user_metadata' ->> 'role'),
     'recruiter'
   );
-$$ LANGUAGE sql STABLE;
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- ADMIN: full access
-CREATE POLICY "admin_all" ON candidates              USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON candidate_scores        USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON assessment_results      USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON assessment_invitations  USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON ai_aptitude_assessments USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON certifications          USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON cert_modules            USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON placements              USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON clients                 USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON roles                   USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON kpi_definitions         USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON throughput_snapshots    USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON requisitions            USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON req_pipeline            USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
-CREATE POLICY "admin_all" ON ai_matches              USING (auth.user_role() = 'admin') WITH CHECK (auth.user_role() = 'admin');
+CREATE POLICY "admin_all" ON candidates              USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON candidate_scores        USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON assessment_results      USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON assessment_invitations  USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON ai_aptitude_assessments USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON certifications          USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON cert_modules            USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON placements              USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON clients                 USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON roles                   USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON kpi_definitions         USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON throughput_snapshots    USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON requisitions            USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON req_pipeline            USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
+CREATE POLICY "admin_all" ON ai_matches              USING (public.user_role() = 'admin') WITH CHECK (public.user_role() = 'admin');
 
 -- RECRUITER: own candidates + all ATS data
 CREATE POLICY "recruiter_own_candidates" ON candidates
-  USING (auth.user_role() = 'recruiter' AND recruiter_id = auth.uid())
-  WITH CHECK (auth.user_role() = 'recruiter' AND recruiter_id = auth.uid());
+  USING (public.user_role() = 'recruiter' AND recruiter_id = auth.uid())
+  WITH CHECK (public.user_role() = 'recruiter' AND recruiter_id = auth.uid());
 
 CREATE POLICY "recruiter_scores" ON candidate_scores
-  USING (auth.user_role() = 'recruiter' AND EXISTS (
+  USING (public.user_role() = 'recruiter' AND EXISTS (
     SELECT 1 FROM candidates c WHERE c.id = candidate_id AND c.recruiter_id = auth.uid()
   ));
 
 CREATE POLICY "recruiter_assessments" ON assessment_results
-  USING (auth.user_role() = 'recruiter' AND EXISTS (
+  USING (public.user_role() = 'recruiter' AND EXISTS (
     SELECT 1 FROM candidates c WHERE c.id = candidate_id AND c.recruiter_id = auth.uid()
   ));
 
 CREATE POLICY "recruiter_ai_assessments" ON ai_aptitude_assessments
-  USING (auth.user_role() = 'recruiter' AND EXISTS (
+  USING (public.user_role() = 'recruiter' AND EXISTS (
     SELECT 1 FROM candidates c WHERE c.id = candidate_id AND c.recruiter_id = auth.uid()
   ));
 
 CREATE POLICY "recruiter_certs" ON certifications
-  USING (auth.user_role() = 'recruiter' AND EXISTS (
+  USING (public.user_role() = 'recruiter' AND EXISTS (
     SELECT 1 FROM candidates c WHERE c.id = candidate_id AND c.recruiter_id = auth.uid()
   ));
 
 CREATE POLICY "recruiter_placements" ON placements
-  USING (auth.user_role() = 'recruiter' AND EXISTS (
+  USING (public.user_role() = 'recruiter' AND EXISTS (
     SELECT 1 FROM candidates c WHERE c.id = candidate_id AND c.recruiter_id = auth.uid()
   ));
 
 CREATE POLICY "recruiter_clients_read" ON clients
-  USING (auth.user_role() IN ('recruiter','admin'));
+  USING (public.user_role() IN ('recruiter','admin'));
 
 CREATE POLICY "recruiter_roles_read" ON roles
-  USING (auth.user_role() IN ('recruiter','admin'));
+  USING (public.user_role() IN ('recruiter','admin'));
 
 CREATE POLICY "recruiter_requisitions" ON requisitions
-  USING (auth.user_role() = 'recruiter')
-  WITH CHECK (auth.user_role() = 'recruiter');
+  USING (public.user_role() = 'recruiter')
+  WITH CHECK (public.user_role() = 'recruiter');
 
 CREATE POLICY "recruiter_pipeline" ON req_pipeline
-  USING (auth.user_role() = 'recruiter')
-  WITH CHECK (auth.user_role() = 'recruiter');
+  USING (public.user_role() = 'recruiter')
+  WITH CHECK (public.user_role() = 'recruiter');
 
 CREATE POLICY "recruiter_ai_matches" ON ai_matches
-  USING (auth.user_role() = 'recruiter')
-  WITH CHECK (auth.user_role() = 'recruiter');
+  USING (public.user_role() = 'recruiter')
+  WITH CHECK (public.user_role() = 'recruiter');
 
 -- CLIENT: read-only on their own placements
 CREATE POLICY "client_placements_read" ON placements
-  USING (auth.user_role() = 'client' AND EXISTS (
+  USING (public.user_role() = 'client' AND EXISTS (
     SELECT 1 FROM clients cl
     WHERE cl.id = client_id
       AND cl.id::text = (auth.jwt() -> 'user_metadata' ->> 'client_id')
   ));
 
 CREATE POLICY "client_throughput_read" ON throughput_snapshots
-  USING (auth.user_role() = 'client' AND EXISTS (
+  USING (public.user_role() = 'client' AND EXISTS (
     SELECT 1 FROM placements p
     JOIN clients cl ON cl.id = p.client_id
     WHERE p.id = placement_id
