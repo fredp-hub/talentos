@@ -2,56 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   TalentOS — Apple-clean design system
+   Airy, light, soft shadows, calm single-accent palette.
+   ============================================================ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    /* Canvas: soft off-white, not pure white — reduces glare, feels premium */
+    --background: 240 20% 99%;
+    --foreground: 240 10% 12%;
+
+    /* Cards sit pure-white above the canvas */
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 240 10% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
-    --radius: 0.5rem;
-    --score-high: 142 71% 45%;
+    --popover-foreground: 240 10% 12%;
+
+    /* Accent: Apple system blue */
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 16% 96.5%;
+    --secondary-foreground: 240 10% 18%;
+    --muted: 240 16% 96.5%;
+    --muted-foreground: 240 6% 48%;
+    --accent: 211 100% 96%;
+    --accent-foreground: 211 100% 38%;
+
+    --destructive: 4 86% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 145 63% 42%;
+    --warning: 38 92% 50%;
+
+    --border: 240 14% 92%;
+    --input: 240 14% 90%;
+    --ring: 211 100% 50%;
+
+    /* Soft, generous corners — the Apple tell */
+    --radius: 0.875rem;
+
+    --score-high: 145 63% 42%;
     --score-mid: 38 92% 50%;
-    --score-low: 0 84% 60%;
+    --score-low: 4 86% 58%;
+
+    /* Layered soft shadows */
+    --shadow-xs: 0 1px 2px 0 hsl(240 10% 12% / 0.04);
+    --shadow-sm: 0 1px 3px 0 hsl(240 10% 12% / 0.06), 0 1px 2px -1px hsl(240 10% 12% / 0.05);
+    --shadow-md: 0 4px 12px -2px hsl(240 10% 12% / 0.08), 0 2px 6px -2px hsl(240 10% 12% / 0.05);
+    --shadow-lg: 0 12px 32px -6px hsl(240 10% 12% / 0.12), 0 6px 14px -6px hsl(240 10% 12% / 0.08);
+    --shadow-xl: 0 24px 60px -12px hsl(240 10% 12% / 0.18);
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --score-high: 142 71% 55%;
+    --background: 240 10% 6%;
+    --foreground: 240 10% 96%;
+    --card: 240 8% 9%;
+    --card-foreground: 240 10% 96%;
+    --popover: 240 8% 9%;
+    --popover-foreground: 240 10% 96%;
+    --primary: 211 100% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 14%;
+    --secondary-foreground: 240 10% 96%;
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 6% 60%;
+    --accent: 211 80% 18%;
+    --accent-foreground: 211 100% 80%;
+    --destructive: 4 76% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 145 55% 50%;
+    --warning: 38 92% 60%;
+    --border: 240 6% 18%;
+    --input: 240 6% 18%;
+    --ring: 211 100% 56%;
+    --score-high: 145 55% 50%;
     --score-mid: 38 92% 60%;
-    --score-low: 0 84% 70%;
+    --score-low: 4 76% 60%;
+    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.5);
+    --shadow-lg: 0 12px 32px -6px hsl(0 0% 0% / 0.6);
+    --shadow-xl: 0 24px 60px -12px hsl(0 0% 0% / 0.7);
   }
 }
 
@@ -61,5 +93,57 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Tighter, more confident headings */
+  h1, h2, h3, h4 {
+    @apply tracking-[-0.02em];
+  }
+}
+
+@layer utilities {
+  .shadow-xs { box-shadow: var(--shadow-xs); }
+  .shadow-soft-sm { box-shadow: var(--shadow-sm); }
+  .shadow-soft { box-shadow: var(--shadow-md); }
+  .shadow-soft-lg { box-shadow: var(--shadow-lg); }
+  .shadow-soft-xl { box-shadow: var(--shadow-xl); }
+
+  /* Frosted-glass surface (topbar, overlays) */
+  .glass {
+    background-color: hsl(var(--background) / 0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  /* Subtle radial hero glow used behind the AI assistant */
+  .ai-glow {
+    background:
+      radial-gradient(60% 120% at 50% 0%, hsl(211 100% 50% / 0.10) 0%, transparent 60%);
+  }
+
+  .animate-in-up {
+    animation: in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes in-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Thin, unobtrusive scrollbars */
+@layer base {
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.25);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+    background-clip: content-box;
   }
 }

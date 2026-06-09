@@ -47,7 +47,9 @@ export default async function DashboardLayout({
           userName={userMeta.full_name}
           userRole={userMeta.role ?? 'recruiter'}
         />
-        <main className="flex-1 p-6 pb-20 lg:pb-6">{children}</main>
+        <main className="flex-1 px-6 py-8 pb-24 lg:px-10 lg:py-10 lg:pb-10">
+          <div className="mx-auto w-full max-w-6xl animate-in-up">{children}</div>
+        </main>
       </div>
     </div>
   )

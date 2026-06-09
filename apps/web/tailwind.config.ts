@@ -49,6 +49,14 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(0 0% 100%)',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(0 0% 100%)',
+        },
         score: {
           high: 'hsl(var(--score-high))',
           mid: 'hsl(var(--score-mid))',
@@ -56,9 +64,14 @@ const config: Config = {
         },
       },
       borderRadius: {
+        '2xl': 'calc(var(--radius) + 6px)',
+        xl: 'calc(var(--radius) + 2px)',
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 4px)',
+        sm: 'calc(var(--radius) - 6px)',
+      },
+      fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }],
       },
       keyframes: {
         'accordion-down': {
