@@ -105,7 +105,7 @@ export default async function CandidateProfilePage({ params }: PageProps) {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">{candidate.full_name}</h2>
+          <h1 className="text-2xl font-semibold tracking-tight">{candidate.full_name}</h1>
           <p className="text-muted-foreground">{candidate.email}</p>
           {candidate.phone && (
             <p className="text-muted-foreground text-sm">{candidate.phone}</p>
@@ -172,7 +172,7 @@ export default async function CandidateProfilePage({ params }: PageProps) {
 
         {score && (
           <div
-            className={`flex flex-col items-center justify-center rounded-xl px-8 py-4 ${getScoreBg(
+            className={`flex flex-col items-center justify-center rounded-2xl px-8 py-4 shadow-soft-sm ${getScoreBg(
               score.overall_score
             )}`}
           >

@@ -230,8 +230,8 @@ export default function OutreachPage() {
     <div className="p-6 space-y-6 max-w-full">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Outreach Campaign</h1>
-          <p className="text-sm text-gray-500 mt-0.5">iLabor database — {candidates.length} candidates</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Outreach Campaign</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">iLabor database — {candidates.length} candidates</p>
         </div>
         <Button variant="outline" size="sm" onClick={loadData} className="gap-2">
           <RefreshCw className="h-4 w-4" /> Refresh
