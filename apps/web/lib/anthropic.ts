@@ -46,6 +46,49 @@ export async function generateGapAnalysis(
   return message.content[0].type === 'text' ? message.content[0].text : ''
 }
 
+export async function generateOutreachMessage(params: {
+  first_name: string
+  source_job_title: string
+  primary_stack: string[]
+  req_title: string
+  customer: string
+  location: string
+  rate: number
+  duration?: string
+}): Promise<string> {
+  const { first_name, source_job_title, primary_stack, req_title, customer, location, rate, duration } = params
+  const message = await client.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 300,
+    system: `You are a recruiter writing a personalized outreach message to a tech professional.
+Write a message that is:
+- Under 5 sentences total
+- Opens with something specific to their background (their previous role/stack)
+- Mentions the specific job opportunity with title, company, location, and rate
+- Has one clear call to action
+- Does NOT use phrases like "I came across your profile" or "hope this finds you well"
+- Feels like it came from a real person, not a template
+- Tone: direct, professional, respectful of their time
+Return ONLY the message text, no subject line, no signature placeholder.`,
+    messages: [{
+      role: 'user',
+      content: `Candidate background: ${source_job_title}, tech stack: ${primary_stack.join(', ')}. Target role: ${req_title} at ${customer}, ${location}, $${rate}/hr${duration ? `, ${duration}` : ''}. Candidate name: ${first_name}.`,
+    }],
+  })
+  return message.content[0].type === 'text' ? message.content[0].text : ''
+}
+
+export async function generateMatchRationale(params: {
+  candidate_name: string
+  matched_skills: string[]
+  total_required: number
+  rate_floor: number
+  availability: string
+}): Promise<string> {
+  const { candidate_name, matched_skills, total_required, rate_floor, availability } = params
+  return `Strong match: ${matched_skills.length} of ${total_required} required skills covered (${matched_skills.slice(0, 3).join(', ')}), rate-aligned at $${rate_floor}/hr, ${availability.replace('_', ' ')} availability.`
+}
+
 export async function generateInterviewQuestions(
   jobDescription: string,
   candidateProfile: string

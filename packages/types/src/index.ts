@@ -58,6 +58,41 @@ export type {
 } from './placement'
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Outreach & Intake types
+// ──────────────────────────────────────────────────────────────────────────────
+
+export type OutreachStatus =
+  | 'not_contacted'
+  | 'outreach_sent'
+  | 'replied'
+  | 'stage2_started'
+  | 'stage2_complete'
+  | 'stage3_scheduled'
+  | 'stage3_complete'
+  | 'submitted'
+  | 'placed'
+  | 'not_interested'
+  | 'unresponsive'
+
+export type WorkType = 'w2_contract' | 'c2c' | 'fulltime' | 'any'
+export type RemotePreference = 'remote' | 'hybrid' | 'onsite' | 'flexible'
+export type AvailabilityWindow = 'immediate' | 'two_weeks' | 'thirty_days' | 'not_looking'
+export type CampaignTier = 'A' | 'B' | 'C' | 'unscored'
+
+export type IntakeFormData = {
+  work_type: WorkType
+  availability: AvailabilityWindow
+  primary_stack: string[]
+  years_experience: number
+  highest_role_summary: string
+  remote_preference: RemotePreference
+  rate_floor_hourly: number | null
+  github_url: string | null
+  ai_experience: boolean
+  ai_experience_detail: string | null
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Match Quality Pipeline types
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -148,6 +183,29 @@ export interface Database {
           notes: string | null
           created_at: string
           updated_at: string
+          // Outreach & intake fields
+          first_name: string | null
+          last_name: string | null
+          work_type: WorkType | null
+          rate_floor_hourly: number | null
+          remote_preference: RemotePreference | null
+          availability: AvailabilityWindow | null
+          available_from: string | null
+          primary_stack: string[] | null
+          years_experience: number | null
+          highest_role_summary: string | null
+          ai_experience: boolean
+          ai_experience_detail: string | null
+          source: string | null
+          source_job_id: string | null
+          outreach_status: OutreachStatus
+          behavioral_notes: string | null
+          management_preference: string | null
+          project_type_preference: string | null
+          ai_match_score: number | null
+          campaign_tier: CampaignTier | null
+          location_city: string | null
+          location_state: string | null
         }
         Insert: {
           full_name: string
@@ -164,6 +222,28 @@ export interface Database {
           availability_date?: string | null
           work_authorization?: string | null
           notes?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          work_type?: WorkType | null
+          rate_floor_hourly?: number | null
+          remote_preference?: RemotePreference | null
+          availability?: AvailabilityWindow | null
+          available_from?: string | null
+          primary_stack?: string[] | null
+          years_experience?: number | null
+          highest_role_summary?: string | null
+          ai_experience?: boolean
+          ai_experience_detail?: string | null
+          source?: string | null
+          source_job_id?: string | null
+          outreach_status?: OutreachStatus
+          behavioral_notes?: string | null
+          management_preference?: string | null
+          project_type_preference?: string | null
+          ai_match_score?: number | null
+          campaign_tier?: CampaignTier | null
+          location_city?: string | null
+          location_state?: string | null
         }
         Update: {
           full_name?: string
@@ -180,6 +260,28 @@ export interface Database {
           availability_date?: string | null
           work_authorization?: string | null
           notes?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          work_type?: WorkType | null
+          rate_floor_hourly?: number | null
+          remote_preference?: RemotePreference | null
+          availability?: AvailabilityWindow | null
+          available_from?: string | null
+          primary_stack?: string[] | null
+          years_experience?: number | null
+          highest_role_summary?: string | null
+          ai_experience?: boolean
+          ai_experience_detail?: string | null
+          source?: string | null
+          source_job_id?: string | null
+          outreach_status?: OutreachStatus
+          behavioral_notes?: string | null
+          management_preference?: string | null
+          project_type_preference?: string | null
+          ai_match_score?: number | null
+          campaign_tier?: CampaignTier | null
+          location_city?: string | null
+          location_state?: string | null
         }
       }
       requisitions: {
@@ -196,9 +298,26 @@ export interface Database {
           c2c_rate: number | null
           job_description: string | null
           status: RequisitionStatus
+          client_id: string | null
+          role_id: string | null
           created_by: string | null
           created_at: string
           updated_at: string
+          // Campaign fields
+          req_id: string | null
+          ats_id: string | null
+          customer: string | null
+          location_city: string | null
+          location_state: string | null
+          is_remote: boolean
+          is_hybrid: boolean
+          bill_rate_hourly: number | null
+          campaign_work_type: WorkType | null
+          required_skills: string[] | null
+          preferred_skills: string[] | null
+          num_positions: number
+          priority_tier: '1' | '2' | '3' | 'deprioritized' | null
+          num_submissions: number
         }
         Insert: {
           ilabor_req_id?: string | null
@@ -212,7 +331,23 @@ export interface Database {
           c2c_rate?: number | null
           job_description?: string | null
           status?: RequisitionStatus
+          client_id?: string | null
+          role_id?: string | null
           created_by?: string | null
+          req_id?: string | null
+          ats_id?: string | null
+          customer?: string | null
+          location_city?: string | null
+          location_state?: string | null
+          is_remote?: boolean
+          is_hybrid?: boolean
+          bill_rate_hourly?: number | null
+          campaign_work_type?: WorkType | null
+          required_skills?: string[] | null
+          preferred_skills?: string[] | null
+          num_positions?: number
+          priority_tier?: '1' | '2' | '3' | 'deprioritized' | null
+          num_submissions?: number
         }
         Update: {
           ilabor_req_id?: string | null
@@ -226,6 +361,104 @@ export interface Database {
           c2c_rate?: number | null
           job_description?: string | null
           status?: RequisitionStatus
+          req_id?: string | null
+          ats_id?: string | null
+          customer?: string | null
+          location_city?: string | null
+          location_state?: string | null
+          is_remote?: boolean
+          is_hybrid?: boolean
+          bill_rate_hourly?: number | null
+          campaign_work_type?: WorkType | null
+          required_skills?: string[] | null
+          preferred_skills?: string[] | null
+          num_positions?: number
+          priority_tier?: '1' | '2' | '3' | 'deprioritized' | null
+          num_submissions?: number
+        }
+      }
+      outreach_log: {
+        Row: {
+          id: string
+          created_at: string
+          candidate_id: string
+          recruiter_id: string | null
+          channel: 'email' | 'linkedin' | 'phone' | 'sms' | null
+          message_template: string | null
+          custom_note: string | null
+          status: 'sent' | 'opened' | 'replied' | 'bounced' | 'opted_out' | null
+          sent_at: string | null
+          replied_at: string | null
+          req_id: string | null
+        }
+        Insert: {
+          candidate_id: string
+          recruiter_id?: string | null
+          channel?: 'email' | 'linkedin' | 'phone' | 'sms' | null
+          message_template?: string | null
+          custom_note?: string | null
+          status?: 'sent' | 'opened' | 'replied' | 'bounced' | 'opted_out' | null
+          sent_at?: string | null
+          replied_at?: string | null
+          req_id?: string | null
+        }
+        Update: {
+          status?: 'sent' | 'opened' | 'replied' | 'bounced' | 'opted_out' | null
+          replied_at?: string | null
+        }
+      }
+      intake_tokens: {
+        Row: {
+          id: string
+          candidate_id: string
+          token_hash: string
+          expires_at: string
+          used_at: string | null
+          created_at: string
+        }
+        Insert: {
+          candidate_id: string
+          token_hash: string
+          expires_at: string
+          used_at?: string | null
+        }
+        Update: {
+          used_at?: string | null
+        }
+      }
+      candidate_req_matches: {
+        Row: {
+          id: string
+          created_at: string
+          candidate_id: string
+          req_id: string
+          match_score: number | null
+          skill_match_pct: number | null
+          rate_aligned: boolean | null
+          location_aligned: boolean | null
+          work_type_aligned: boolean | null
+          ai_rationale: string | null
+          status: 'suggested' | 'recruiter_approved' | 'outreach_sent' | 'candidate_interested' | 'submitted' | 'interviewing' | 'offered' | 'placed' | 'rejected' | 'withdrew'
+        }
+        Insert: {
+          candidate_id: string
+          req_id: string
+          match_score?: number | null
+          skill_match_pct?: number | null
+          rate_aligned?: boolean | null
+          location_aligned?: boolean | null
+          work_type_aligned?: boolean | null
+          ai_rationale?: string | null
+          status?: 'suggested' | 'recruiter_approved' | 'outreach_sent' | 'candidate_interested' | 'submitted' | 'interviewing' | 'offered' | 'placed' | 'rejected' | 'withdrew'
+        }
+        Update: {
+          match_score?: number | null
+          skill_match_pct?: number | null
+          rate_aligned?: boolean | null
+          location_aligned?: boolean | null
+          work_type_aligned?: boolean | null
+          ai_rationale?: string | null
+          status?: 'suggested' | 'recruiter_approved' | 'outreach_sent' | 'candidate_interested' | 'submitted' | 'interviewing' | 'offered' | 'placed' | 'rejected' | 'withdrew'
         }
       }
       req_pipeline: {

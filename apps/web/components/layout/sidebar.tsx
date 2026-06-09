@@ -12,6 +12,8 @@ import {
   Building2,
   FileText,
   LogOut,
+  Send,
+  Upload,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -20,6 +22,8 @@ const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Requisitions', href: '/dashboard/requisitions', icon: FileText },
   { label: 'Candidates', href: '/dashboard/candidates', icon: Users },
+  { label: 'Outreach', href: '/dashboard/outreach', icon: Send },
+  { label: 'Import', href: '/dashboard/candidates/import', icon: Upload },
   { label: 'Assessments', href: '/dashboard/assessments', icon: ClipboardList },
   { label: 'Certifications', href: '/dashboard/certifications', icon: Award },
   { label: 'Placements', href: '/dashboard/placements', icon: Briefcase },
