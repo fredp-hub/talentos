@@ -1,13 +1,15 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NewRequisitionButton } from './new-requisition-button'
 import Link from 'next/link'
 import { formatDate, capitalize } from '@/lib/utils'
-import { MapPin, Calendar, DollarSign, Users, ExternalLink } from 'lucide-react'
+import { ExternalLink, Users } from 'lucide-react'
 import type { Database } from '@talentos/types'
+import { CampaignRequisitions } from '@/components/requisitions/campaign-requisitions'
 
 type ReqSummaryRow = Database['public']['Views']['v_requisition_summary']['Row']
 
@@ -51,37 +53,27 @@ async function RequisitionList() {
           {data.map((r) => (
             <tr key={r.id} className="hover:bg-muted/50 transition-colors">
               <td className="py-3 pr-4">
-                <Link
-                  href={`/dashboard/requisitions/${r.id}`}
-                  className="font-medium hover:underline flex items-center gap-1"
-                >
+                <Link href={`/dashboard/requisitions/${r.id}`} className="font-medium hover:underline flex items-center gap-1">
                   {r.title}
                   <ExternalLink className="h-3 w-3 text-muted-foreground" />
                 </Link>
-                {r.ilabor_req_id && (
-                  <p className="text-xs text-muted-foreground">{r.ilabor_req_id}</p>
-                )}
+                {r.ilabor_req_id && <p className="text-xs text-muted-foreground">{r.ilabor_req_id}</p>}
               </td>
               <td className="py-3 pr-4 hidden md:table-cell text-muted-foreground">
                 {r.client_name ?? '—'}
                 {r.end_customer && <p className="text-xs">{r.end_customer}</p>}
               </td>
               <td className="py-3 pr-4 hidden lg:table-cell text-muted-foreground">{r.location ?? '—'}</td>
-              <td className="py-3 pr-4 hidden sm:table-cell">
-                {r.c2c_rate ? `$${r.c2c_rate}/hr` : '—'}
-              </td>
+              <td className="py-3 pr-4 hidden sm:table-cell">{r.c2c_rate ? `$${r.c2c_rate}/hr` : '—'}</td>
               <td className="py-3 pr-4">
                 <Badge variant={statusVariant(r.status)}>{capitalize(r.status)}</Badge>
               </td>
               <td className="py-3 pr-4 hidden sm:table-cell text-center">
                 <span className="inline-flex items-center gap-1 text-muted-foreground">
-                  <Users className="h-3 w-3" />
-                  {r.candidate_count}
+                  <Users className="h-3 w-3" />{r.candidate_count}
                 </span>
               </td>
-              <td className="py-3 hidden lg:table-cell text-muted-foreground">
-                {formatDate(r.start_date)}
-              </td>
+              <td className="py-3 hidden lg:table-cell text-muted-foreground">{formatDate(r.start_date)}</td>
             </tr>
           ))}
         </tbody>
@@ -91,33 +83,42 @@ async function RequisitionList() {
 }
 
 function TableSkeleton() {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Skeleton key={i} className="h-12 w-full" />
-      ))}
-    </div>
-  )
+  return <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
 }
 
 export default function RequisitionsPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Requisitions</h2>
-          <p className="text-muted-foreground mt-1">Open job requisitions and candidate pipelines.</p>
+    <div className="space-y-8">
+      {/* Campaign requisitions — the seeded Randstad jobs */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">Campaign Requisitions</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">Randstad / iLabor active positions — sorted by tier and match count</p>
+          </div>
         </div>
-        <NewRequisitionButton />
+        <Suspense fallback={<TableSkeleton />}>
+          <CampaignRequisitions />
+        </Suspense>
       </div>
 
-      <Card>
-        <CardContent className="pt-4">
-          <Suspense fallback={<TableSkeleton />}>
-            <RequisitionList />
-          </Suspense>
-        </CardContent>
-      </Card>
+      {/* ATS requisitions — existing pipeline */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">ATS Requisitions</h2>
+            <p className="text-muted-foreground text-sm mt-0.5">Open job requisitions and candidate pipelines.</p>
+          </div>
+          <NewRequisitionButton />
+        </div>
+        <Card>
+          <CardContent className="pt-4">
+            <Suspense fallback={<TableSkeleton />}>
+              <RequisitionList />
+            </Suspense>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

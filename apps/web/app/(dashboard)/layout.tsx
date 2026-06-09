@@ -14,6 +14,9 @@ function getTitle(pathname: string): string {
   if (pathname.startsWith('/dashboard/placements')) return 'Placements'
   if (pathname.startsWith('/dashboard/analytics')) return 'Analytics'
   if (pathname.startsWith('/dashboard/clients')) return 'Clients'
+  if (pathname.startsWith('/dashboard/outreach')) return 'Outreach Campaign'
+  if (pathname.startsWith('/dashboard/candidates/import')) return 'Import Candidates'
+  if (pathname.startsWith('/intake')) return 'Candidate Intake'
   return 'TalentOS'
 }
 
