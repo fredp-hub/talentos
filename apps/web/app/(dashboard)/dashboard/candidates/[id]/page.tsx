@@ -9,6 +9,7 @@ import { AssessmentStatusBadge } from '@/components/assessments/assessment-statu
 import { CandidateAtsSection } from '@/components/candidates/candidate-ats-section'
 import { getScoreBg, capitalize, formatDate, formatScore } from '@/lib/utils'
 import { ArrowLeft, AlertTriangle, Linkedin, ExternalLink } from 'lucide-react'
+import { MatchPanel } from '@/components/candidates/match-panel'
 import type { Database, AssessmentFramework } from '@talentos/types'
 
 type CandidateRow = Database['public']['Tables']['candidates']['Row']
@@ -381,6 +382,9 @@ export default async function CandidateProfilePage({ params }: PageProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Match Quality Panel — auto-triggers if activeRequisition in store */}
+      <MatchPanel candidateId={id} candidateName={candidate.full_name} />
 
       {/* Requisition Pipeline History */}
       {reqPipeline && reqPipeline.length > 0 && (

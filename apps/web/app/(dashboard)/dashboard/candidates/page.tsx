@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
-import { CandidateTable } from '@/components/candidates/candidate-table'
+import { MatchCandidateTable } from '@/components/candidates/match-table-columns'
+import { RequisitionSelector } from '@/components/candidates/requisition-selector'
 import { Skeleton } from '@/components/ui/skeleton'
 
 function TableSkeleton() {
@@ -25,8 +26,9 @@ export default function CandidatesPage() {
           Manage and track all candidates through your staffing workflow.
         </p>
       </div>
+      <RequisitionSelector />
       <Suspense fallback={<TableSkeleton />}>
-        <CandidateTable />
+        <MatchCandidateTable />
       </Suspense>
     </div>
   )

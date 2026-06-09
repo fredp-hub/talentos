@@ -57,6 +57,49 @@ export type {
   KpiDefinition,
 } from './placement'
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Match Quality Pipeline types
+// ──────────────────────────────────────────────────────────────────────────────
+
+export type ScoreDimension = {
+  label: string
+  score: number       // 0–100
+  weight: number      // 0–1, weights across dimensions sum to 1
+  rationale: string   // plain-English explanation, 1 sentence
+}
+
+export type SkillGap = {
+  skill: string
+  priority: 'blocker' | 'important' | 'nice-to-have'
+  trainable: boolean
+  estimated_ramp_weeks: number | null
+}
+
+export type MatchResult = {
+  candidate_id: string
+  requisition_id: string
+  composite_score: number                                    // 0–100 final weighted score
+  tier: 'A' | 'B' | 'C'                                    // A=75+, B=50–74, C=<50
+  dimensions: ScoreDimension[]
+  skill_gaps: SkillGap[]
+  reverse_compatibility_score: number
+  submission_ready: boolean
+  rationale_summary: string                                 // 2–3 sentence plain-English summary
+  hogan_triggered: boolean                                  // true if seniority = director_plus
+  derailer_risk_level: 'none' | 'low' | 'elevated' | 'high' | null
+}
+
+export type RequisitionContext = {
+  id: string
+  title: string
+  seniority_level: string
+  required_skills: string[]
+  desired_skills: string[]
+  client_name: string
+  c2c_rate: number
+  start_date: string
+}
+
 // Client & Role
 export interface Client {
   id: string
