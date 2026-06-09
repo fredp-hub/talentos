@@ -23,8 +23,8 @@ function isRateLimited(ip: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Public intake form — bypass auth, apply rate limiting
-  if (pathname.startsWith('/intake/')) {
+  // Public intake form + AI survey — bypass auth, apply rate limiting
+  if (pathname.startsWith('/intake/') || pathname.startsWith('/survey/')) {
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       request.headers.get('x-real-ip') ??

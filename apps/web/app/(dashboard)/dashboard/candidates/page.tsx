@@ -21,9 +21,9 @@ export default function CandidatesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Candidate Pipeline</h2>
-        <p className="text-muted-foreground mt-1">
-          Manage and track all candidates through your staffing workflow.
+        <h1 className="text-2xl font-semibold tracking-tight">Candidates</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Search, filter, and match your full talent pool.
         </p>
       </div>
       <RequisitionSelector />

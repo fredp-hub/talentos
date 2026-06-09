@@ -11,6 +11,7 @@ import { getScoreBg, capitalize, formatDate, formatScore } from '@/lib/utils'
 import { ArrowLeft, AlertTriangle, Linkedin, ExternalLink } from 'lucide-react'
 import { MatchPanel } from '@/components/candidates/match-panel'
 import { CampaignPanel } from '@/components/candidates/campaign-panel'
+import { SurveyResultsPanel } from '@/components/candidates/survey-results-panel'
 import type { Database, AssessmentFramework } from '@talentos/types'
 
 type CandidateRow = Database['public']['Tables']['candidates']['Row']
@@ -386,6 +387,9 @@ export default async function CandidateProfilePage({ params }: PageProps) {
 
       {/* Match Quality Panel — auto-triggers if activeRequisition in store */}
       <MatchPanel candidateId={id} candidateName={candidate.full_name} />
+
+      {/* AI personality survey — generate link or view AI read */}
+      <SurveyResultsPanel candidateId={id} />
 
       {/* Campaign / Outreach panel — renders only for iLabor campaign candidates */}
       <CampaignPanel candidateId={id} />

@@ -82,13 +82,14 @@ export default function AddCandidatePage() {
     if (!createdId) return
     setGeneratingLink(true)
     try {
-      const res = await fetch('/api/intake/generate-link', {
+      const res = await fetch('/api/survey/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ candidateId: createdId }),
       })
       const json = await res.json()
-      setSurveyLink(json.link)
+      if (json.link) setSurveyLink(json.link)
+      else setError(json.error ?? 'Could not generate survey link')
     } finally {
       setGeneratingLink(false)
     }

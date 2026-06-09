@@ -12,15 +12,18 @@ import {
   type Row,
 } from '@tanstack/react-table'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useMatchStore } from '@/stores/matchStore'
 import { useCandidates, type CandidateFilters } from '@/lib/hooks/use-candidates'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AddCandidateForm } from './add-candidate-form'
 import { getScoreBg, formatScore, capitalize } from '@/lib/utils'
 import { UserPlus, Search, ChevronUp, ChevronDown, X, Zap } from 'lucide-react'
 import type { Database, MatchResult } from '@talentos/types'
+
+const selectClass =
+  'rounded-xl border border-border bg-card px-3.5 h-10 text-sm shadow-xs focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-all'
 
 type PipelineRow = Database['public']['Views']['v_candidate_pipeline']['Row']
 
@@ -198,7 +201,6 @@ export function MatchCandidateTable() {
   const [filters, setFilters] = useState<CandidateFilters>({})
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
-  const [slideoverOpen, setSlideoverOpen] = useState(false)
 
   const { data, isLoading } = useCandidates({ ...filters, search: search || undefined })
 
@@ -250,7 +252,7 @@ export function MatchCandidateTable() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-1.5 text-sm flex-1 min-w-48">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3.5 h-10 text-sm flex-1 min-w-48 shadow-xs">
           <Search className="h-4 w-4 text-muted-foreground shrink-0" />
           <input
             value={search}
@@ -273,7 +275,7 @@ export function MatchCandidateTable() {
               seniority_level: (e.target.value as CandidateFilters['seniority_level']) || undefined,
             }))
           }
-          className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          className={selectClass}
         >
           <option value="">All Seniority</option>
           <option value="junior">Junior</option>
@@ -291,7 +293,7 @@ export function MatchCandidateTable() {
               status: (e.target.value as CandidateFilters['status']) || undefined,
             }))
           }
-          className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          className={selectClass}
         >
           <option value="">All Status</option>
           <option value="active">Active</option>
@@ -308,7 +310,7 @@ export function MatchCandidateTable() {
               cert_status: (e.target.value as CandidateFilters['cert_status']) || undefined,
             }))
           }
-          className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          className={selectClass}
         >
           <option value="">All Certs</option>
           <option value="certified">Certified</option>
@@ -319,21 +321,23 @@ export function MatchCandidateTable() {
 
         {activeRequisition && (
           <Button onClick={runMatch} disabled={isScoring || isLoading} variant="default">
-            <Zap className="mr-2 h-4 w-4" />
+            <Zap className="h-4 w-4" />
             {isScoring ? 'Scoring…' : 'Run Match'}
           </Button>
         )}
 
-        <Button onClick={() => setSlideoverOpen(true)} variant={activeRequisition ? 'outline' : 'default'}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Add Candidate
+        <Button asChild variant={activeRequisition ? 'outline' : 'default'}>
+          <Link href="/dashboard/candidates/add">
+            <UserPlus className="h-4 w-4" />
+            Add Candidate
+          </Link>
         </Button>
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border overflow-x-auto">
+      <div className="rounded-2xl border border-border/70 bg-card shadow-soft-sm overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50">
+          <thead className="border-b border-border/70 bg-secondary/40">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
@@ -413,28 +417,6 @@ export function MatchCandidateTable() {
           </div>
         )}
       </div>
-
-      {/* Slide-over */}
-      {slideoverOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
-            onClick={() => setSlideoverOpen(false)}
-          />
-          <div className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-card border-l shadow-xl p-6 overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Add Candidate</h2>
-              <button
-                onClick={() => setSlideoverOpen(false)}
-                className="rounded-md p-1.5 hover:bg-accent transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <AddCandidateForm onSuccess={() => setSlideoverOpen(false)} />
-          </div>
-        </>
-      )}
     </div>
   )
 }
