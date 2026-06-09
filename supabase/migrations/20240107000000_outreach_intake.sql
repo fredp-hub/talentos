@@ -66,7 +66,8 @@ UPDATE requisitions SET bill_rate_hourly = c2c_rate WHERE bill_rate_hourly IS NU
 UPDATE requisitions SET customer = end_customer WHERE customer IS NULL AND end_customer IS NOT NULL;
 
 -- Unique index on req_id so we can upsert
-CREATE UNIQUE INDEX IF NOT EXISTS idx_requisitions_req_id ON requisitions(req_id) WHERE req_id IS NOT NULL;
+-- NOTE: must NOT be a partial index — ON CONFLICT requires a full unique constraint
+CREATE UNIQUE INDEX IF NOT EXISTS idx_requisitions_req_id ON requisitions(req_id);
 
 -- ── New table: outreach_log ─────────────────────────────────
 CREATE TABLE IF NOT EXISTS outreach_log (
