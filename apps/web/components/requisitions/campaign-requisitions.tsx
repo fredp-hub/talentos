@@ -261,9 +261,9 @@ export function CampaignRequisitions() {
     const { data } = await (supabase as any)
       .from('requisitions')
       .select('id, req_id, title, customer, location_city, location_state, bill_rate_hourly, campaign_work_type, priority_tier, status, num_positions, required_skills, is_remote')
-      .not('req_id', 'is', null)
+      .eq('status', 'open')
       .order('priority_tier', { ascending: true })
-      .order('bill_rate_hourly', { ascending: false })
+      .order('created_at', { ascending: false })
 
     setReqs(data ?? [])
 
@@ -353,8 +353,10 @@ export function CampaignRequisitions() {
             <tbody className="divide-y">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center text-gray-400 py-10">
-                    No campaign requisitions match the current filters
+                  <td colSpan={8} className="text-center text-muted-foreground py-12">
+                    {reqs.length === 0
+                      ? 'No requisitions yet. Click “New Requisition” to add your first one.'
+                      : 'No requisitions match the current filters.'}
                   </td>
                 </tr>
               ) : (
