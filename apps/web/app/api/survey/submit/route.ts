@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateIntakeToken, markTokenUsed } from '@/app/actions/intake-tokens'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { scoreSurveyResponses } from '@/lib/anthropic'
+import { scoreSurveyResponses, evaluateCandidate } from '@/lib/anthropic'
 
 export async function POST(request: NextRequest) {
   const { token, surveyId, responses } = await request.json()
@@ -55,17 +55,64 @@ export async function POST(request: NextRequest) {
     })
     .eq('id', surveyId)
 
-  // Roll up to candidate profile
+  // Roll up to candidate profile + advance pipeline phase
   await (admin as any)
     .from('candidates')
     .update({
       personality_summary: scoring.ai_summary,
       personality_scores: scoring.personality_scores,
       survey_completed_at: now,
+      pipeline_phase: 'survey_complete',
     })
     .eq('id', validated.candidateId)
 
   await markTokenUsed(validated.tokenId)
+
+  // Re-evaluate fit with the new personality signal (survey stage)
+  try {
+    const { data: c } = await (admin as any)
+      .from('candidates')
+      .select('full_name, source_job_title, primary_stack, years_experience, availability, rate_floor_hourly, location_city, location_state')
+      .eq('id', validated.candidateId)
+      .single()
+
+    const { data: last } = await (admin as any)
+      .from('candidate_fit_scores')
+      .select('score')
+      .eq('candidate_id', validated.candidateId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const prev = last?.score != null ? Number(last.score) : null
+
+    const evalResult = await evaluateCandidate({
+      stage: 'survey',
+      previousScore: prev,
+      full_name: c?.full_name ?? 'Candidate',
+      source_job_title: c?.source_job_title,
+      primary_stack: c?.primary_stack,
+      years_experience: c?.years_experience,
+      availability: c?.availability,
+      rate_floor_hourly: c?.rate_floor_hourly,
+      location: [c?.location_city, c?.location_state].filter(Boolean).join(', '),
+      personality_summary: scoring.ai_summary,
+      personality_scores: scoring.personality_scores,
+    })
+
+    await (admin as any).from('candidate_fit_scores').insert({
+      candidate_id: validated.candidateId,
+      stage: 'survey',
+      score: evalResult.score,
+      delta: prev != null ? Number((evalResult.score - prev).toFixed(1)) : null,
+      feedback: evalResult.feedback,
+      technical_snapshot: evalResult.technical_snapshot,
+      personality_snapshot: evalResult.personality_snapshot,
+    })
+    await (admin as any).from('candidates').update({ current_fit_score: evalResult.score }).eq('id', validated.candidateId)
+  } catch {
+    // non-fatal
+  }
 
   return NextResponse.json({ success: true })
 }

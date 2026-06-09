@@ -12,6 +12,8 @@ import { ArrowLeft, AlertTriangle, Linkedin, ExternalLink } from 'lucide-react'
 import { MatchPanel } from '@/components/candidates/match-panel'
 import { CampaignPanel } from '@/components/candidates/campaign-panel'
 import { SurveyResultsPanel } from '@/components/candidates/survey-results-panel'
+import { CandidateIntelligence } from '@/components/candidates/candidate-intelligence'
+import { PhaseControl } from '@/components/candidates/pipeline-phase'
 import type { Database, AssessmentFramework } from '@talentos/types'
 
 type CandidateRow = Database['public']['Tables']['candidates']['Row']
@@ -142,6 +144,16 @@ export default async function CandidateProfilePage({ params }: PageProps) {
             {candidate.availability_date && (
               <Badge variant="outline">Avail: {formatDate(candidate.availability_date)}</Badge>
             )}
+            {(candidate.location_city || candidate.location_state) && (
+              <Badge variant="outline">
+                📍 {[candidate.location_city, candidate.location_state].filter(Boolean).join(', ')}
+              </Badge>
+            )}
+          </div>
+
+          {/* Pipeline phase */}
+          <div className="mt-4">
+            <PhaseControl candidateId={id} phase={(candidate as { pipeline_phase?: string }).pipeline_phase ?? 'new'} />
           </div>
 
           {candidate.skills && candidate.skills.length > 0 && (
@@ -387,6 +399,9 @@ export default async function CandidateProfilePage({ params }: PageProps) {
 
       {/* Match Quality Panel — auto-triggers if activeRequisition in store */}
       <MatchPanel candidateId={id} candidateName={candidate.full_name} />
+
+      {/* Evolving fit score + recruiter notes */}
+      <CandidateIntelligence candidateId={id} />
 
       {/* AI personality survey — generate link or view AI read */}
       <SurveyResultsPanel candidateId={id} />

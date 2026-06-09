@@ -18,7 +18,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Loader2, Users, ChevronRight, Star } from 'lucide-react'
+import { Loader2, Users, ChevronRight, Star, Sparkles } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -86,6 +86,8 @@ function ReqDetail({ req, onClose }: { req: CampaignReq; onClose: () => void }) 
     load()
   }, [req.id])
 
+  const [explain, setExplain] = useState<Record<string, { loading: boolean; why?: string; alternatives?: { id: string; title: string; customer?: string | null; reason: string }[] }>>({})
+
   const approveMatch = async (matchId: string) => {
     await (supabase as any)
       .from('candidate_req_matches')
@@ -94,6 +96,21 @@ function ReqDetail({ req, onClose }: { req: CampaignReq; onClose: () => void }) 
     setMatches((prev) =>
       prev.map((m) => (m.id === matchId ? { ...m, status: 'recruiter_approved' } : m))
     )
+  }
+
+  const explainFit = async (candidateId: string) => {
+    setExplain((e) => ({ ...e, [candidateId]: { loading: true } }))
+    try {
+      const res = await fetch('/api/requisition/explain-fit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ candidateId, reqId: req.id }),
+      })
+      const json = await res.json()
+      setExplain((e) => ({ ...e, [candidateId]: { loading: false, why: json.why, alternatives: json.alternatives } }))
+    } catch {
+      setExplain((e) => ({ ...e, [candidateId]: { loading: false, why: 'Could not analyze — please retry.' } }))
+    }
   }
 
   return (
@@ -153,32 +170,69 @@ function ReqDetail({ req, onClose }: { req: CampaignReq; onClose: () => void }) 
           ) : (
             <div className="space-y-2">
               {matches.map((m) => (
-                <div key={m.id} className="flex items-center justify-between border rounded-lg px-3 py-2">
-                  <div>
-                    <p className="text-sm font-medium">{m.candidates?.full_name ?? '—'}</p>
-                    <p className="text-xs text-gray-400">
-                      {m.candidates?.primary_stack?.slice(0, 3).join(', ') ?? ''}
-                    </p>
+                <div key={m.id} className="border border-border/70 rounded-xl px-3 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{m.candidates?.full_name ?? '—'}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {m.candidates?.primary_stack?.slice(0, 3).join(', ') ?? ''}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {m.candidates?.campaign_tier && (
+                        <Badge className={`text-xs ${CANDIDATE_TIER_STYLE[m.candidates.campaign_tier] ?? ''}`}>
+                          {m.candidates.campaign_tier}
+                        </Badge>
+                      )}
+                      <span className="text-sm font-mono">{Math.round(m.match_score)}</span>
+                      {m.status === 'suggested' ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-1.5 text-xs"
+                          onClick={() => approveMatch(m.id)}
+                          title="Approve for submission"
+                        >
+                          <Star className="h-3.5 w-3.5" />
+                        </Button>
+                      ) : (
+                        <Badge className="text-xs bg-[hsl(var(--success)/0.12)] text-[hsl(var(--success))]" variant="outline">✓</Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {m.candidates?.campaign_tier && (
-                      <Badge className={`text-xs ${CANDIDATE_TIER_STYLE[m.candidates.campaign_tier] ?? ''}`}>
-                        {m.candidates.campaign_tier}
-                      </Badge>
-                    )}
-                    <span className="text-sm font-mono">{Math.round(m.match_score)}</span>
-                    {m.status === 'suggested' ? (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 px-1.5 text-xs"
-                        onClick={() => approveMatch(m.id)}
-                        title="Approve"
-                      >
-                        <Star className="h-3 w-3" />
-                      </Button>
-                    ) : (
-                      <Badge className="text-xs bg-green-50 text-green-600 border-green-100" variant="outline">✓</Badge>
+
+                  {/* Why / better-fit assistant */}
+                  <div className="mt-1.5">
+                    <button
+                      onClick={() => explainFit(m.candidate_id)}
+                      className="text-2xs text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      {explain[m.candidate_id]?.loading ? 'Analyzing…' : 'Why / better fit?'}
+                    </button>
+
+                    {explain[m.candidate_id] && !explain[m.candidate_id].loading && (
+                      <div className="mt-2 rounded-lg bg-secondary/50 p-2.5 text-xs space-y-2 animate-in-up">
+                        {explain[m.candidate_id].why && (
+                          <p className="text-foreground/80">{explain[m.candidate_id].why}</p>
+                        )}
+                        {explain[m.candidate_id].alternatives && explain[m.candidate_id].alternatives!.length > 0 && (
+                          <div className="space-y-1">
+                            <p className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Better-fit roles</p>
+                            {explain[m.candidate_id].alternatives!.map((alt) => (
+                              <a
+                                key={alt.id}
+                                href={`/dashboard/requisitions/${alt.id}`}
+                                className="block rounded-md bg-card border border-border/70 px-2 py-1.5 hover:border-input transition-colors"
+                              >
+                                <span className="font-medium">{alt.title}</span>
+                                {alt.customer && <span className="text-muted-foreground"> · {alt.customer}</span>}
+                                <span className="block text-muted-foreground mt-0.5">{alt.reason}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

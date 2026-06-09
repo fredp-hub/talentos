@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PipelineBoard } from '@/components/requisitions/pipeline-board'
 import { AiMatchPanel } from '@/components/requisitions/ai-match-panel'
+import { ScreeningQuestions } from '@/components/requisitions/screening-questions'
 
 interface RequisitionTabsProps {
   requisitionId: string
@@ -16,6 +17,7 @@ export function RequisitionTabs({ requisitionId, jobDescription }: RequisitionTa
       <TabsList>
         <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
         <TabsTrigger value="ai">AI Matching</TabsTrigger>
+        <TabsTrigger value="screening">Screening</TabsTrigger>
         <TabsTrigger value="details">Details</TabsTrigger>
       </TabsList>
 
@@ -25,6 +27,10 @@ export function RequisitionTabs({ requisitionId, jobDescription }: RequisitionTa
 
       <TabsContent value="ai" className="mt-4">
         <AiMatchPanel requisitionId={requisitionId} />
+      </TabsContent>
+
+      <TabsContent value="screening" className="mt-4">
+        <ScreeningQuestions requisitionId={requisitionId} />
       </TabsContent>
 
       <TabsContent value="details" className="mt-4">
