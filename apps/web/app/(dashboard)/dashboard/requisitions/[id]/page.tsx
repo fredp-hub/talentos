@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Building2 } from 'lucide-react'
 import { capitalize, formatDate } from '@/lib/utils'
 import { RequisitionTabs } from './requisition-tabs'
+import { RequisitionActions } from '@/components/requisitions/requisition-actions'
 import type { Database } from '@talentos/types'
 
 type RequisitionRow = Database['public']['Tables']['requisitions']['Row']
@@ -49,10 +50,32 @@ export default async function RequisitionDetailPage({ params }: PageProps) {
               <h1 className="text-2xl font-bold tracking-tight">{req.title}</h1>
               <Badge variant={statusVariant(req.status)}>{capitalize(req.status)}</Badge>
             </div>
-            {req.ilabor_req_id && (
-              <p className="text-sm text-muted-foreground mt-0.5">Req ID: {req.ilabor_req_id}</p>
+            {(req.ilabor_req_id || (req as { req_id?: string }).req_id) && (
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Req ID: {req.ilabor_req_id ?? (req as { req_id?: string }).req_id}
+              </p>
             )}
           </div>
+          <RequisitionActions
+            requisition={{
+              id: req.id,
+              title: req.title,
+              customer: (req as { customer?: string | null }).customer ?? null,
+              client_name: req.client_name,
+              req_id: (req as { req_id?: string | null }).req_id ?? null,
+              location_city: (req as { location_city?: string | null }).location_city ?? null,
+              location_state: (req as { location_state?: string | null }).location_state ?? null,
+              is_remote: (req as { is_remote?: boolean | null }).is_remote ?? null,
+              bill_rate_hourly: (req as { bill_rate_hourly?: number | null }).bill_rate_hourly ?? null,
+              campaign_work_type: (req as { campaign_work_type?: string | null }).campaign_work_type ?? null,
+              seniority_level: (req as { seniority_level?: string | null }).seniority_level ?? null,
+              required_skills: (req as { required_skills?: string[] | null }).required_skills ?? null,
+              preferred_skills: (req as { preferred_skills?: string[] | null }).preferred_skills ?? null,
+              num_positions: (req as { num_positions?: number | null }).num_positions ?? null,
+              priority_tier: (req as { priority_tier?: string | null }).priority_tier ?? null,
+              description: (req as { description?: string | null }).description ?? null,
+            }}
+          />
         </div>
 
         <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-sm text-muted-foreground">

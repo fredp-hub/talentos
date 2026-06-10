@@ -210,6 +210,21 @@ export default function OutreachPage() {
     }
   }
 
+  const updateStatus = async (candidateId: string, status: OutreachStatus) => {
+    // optimistic
+    setCandidates((prev) => prev.map((c) => (c.id === candidateId ? { ...c, outreach_status: status } : c)))
+    await (supabase as any).from('candidates').update({ outreach_status: status }).eq('id', candidateId)
+    // log the activity
+    await (supabase as any).from('outreach_log').insert({
+      candidate_id: candidateId,
+      channel: 'email',
+      status: status === 'replied' ? 'replied' : status === 'not_interested' ? 'opted_out' : 'sent',
+      message_template: `Status set to ${STATUS_LABELS[status]}`,
+      sent_at: new Date().toISOString(),
+      req_id: selectedReq || null,
+    })
+  }
+
   const bulkGenerate = async () => {
     if (!selectedReq || selected.size === 0) return
     setBulkGenerating(true)
@@ -374,9 +389,16 @@ export default function OutreachPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Badge className={`text-xs ${STATUS_COLORS[c.outreach_status] ?? STATUS_COLORS.not_contacted}`}>
-                        {STATUS_LABELS[c.outreach_status]}
-                      </Badge>
+                      <Select value={c.outreach_status} onValueChange={(v) => updateStatus(c.id, v as OutreachStatus)}>
+                        <SelectTrigger className={`h-7 w-[150px] border-0 text-xs font-medium ${STATUS_COLORS[c.outreach_status] ?? STATUS_COLORS.not_contacted}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                            <SelectItem key={val} value={val}>{label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <p className="text-xs text-gray-500 max-w-[180px] truncate">

@@ -10,20 +10,52 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
-import { createRequisition } from '@/app/actions/create-requisition'
+import { createRequisition, updateRequisition } from '@/app/actions/create-requisition'
+
+export interface RequisitionInitial {
+  id: string
+  title?: string | null
+  customer?: string | null
+  client_name?: string | null
+  req_id?: string | null
+  location_city?: string | null
+  location_state?: string | null
+  is_remote?: boolean | null
+  bill_rate_hourly?: number | null
+  campaign_work_type?: string | null
+  seniority_level?: string | null
+  required_skills?: string[] | null
+  preferred_skills?: string[] | null
+  num_positions?: number | null
+  priority_tier?: string | null
+  description?: string | null
+}
 
 interface RequisitionFormProps {
   onSuccess?: (id: string) => void
+  initial?: RequisitionInitial
 }
 
-export function RequisitionForm({ onSuccess }: RequisitionFormProps) {
+export function RequisitionForm({ onSuccess, initial }: RequisitionFormProps) {
   const router = useRouter()
+  const isEdit = !!initial?.id
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
-    title: '', customer: '', req_id: '', location_city: '', location_state: '',
-    is_remote: false, bill_rate_hourly: '', campaign_work_type: '', seniority_level: 'mid',
-    required_skills: '', preferred_skills: '', num_positions: '1', priority_tier: '2', description: '',
+    title: initial?.title ?? '',
+    customer: initial?.customer ?? initial?.client_name ?? '',
+    req_id: initial?.req_id ?? '',
+    location_city: initial?.location_city ?? '',
+    location_state: initial?.location_state ?? '',
+    is_remote: initial?.is_remote ?? false,
+    bill_rate_hourly: initial?.bill_rate_hourly != null ? String(initial.bill_rate_hourly) : '',
+    campaign_work_type: initial?.campaign_work_type ?? '',
+    seniority_level: initial?.seniority_level ?? 'mid',
+    required_skills: (initial?.required_skills ?? []).join(', '),
+    preferred_skills: (initial?.preferred_skills ?? []).join(', '),
+    num_positions: initial?.num_positions != null ? String(initial.num_positions) : '1',
+    priority_tier: initial?.priority_tier ?? '2',
+    description: initial?.description ?? '',
   })
 
   const set = (k: keyof typeof form, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }))
@@ -32,7 +64,7 @@ export function RequisitionForm({ onSuccess }: RequisitionFormProps) {
     e.preventDefault()
     setError(null)
     setSaving(true)
-    const res = await createRequisition({
+    const payload = {
       title: form.title,
       customer: form.customer,
       req_id: form.req_id || undefined,
@@ -47,9 +79,12 @@ export function RequisitionForm({ onSuccess }: RequisitionFormProps) {
       num_positions: form.num_positions ? Number(form.num_positions) : 1,
       priority_tier: form.priority_tier,
       description: form.description,
-    })
+    }
+    const res = isEdit
+      ? await updateRequisition(initial!.id, payload)
+      : await createRequisition(payload)
     setSaving(false)
-    if (!res.ok) { setError(res.error ?? 'Failed to create requisition'); return }
+    if (!res.ok) { setError(res.error ?? 'Failed to save requisition'); return }
     if (onSuccess) onSuccess(res.id!)
     else router.push(`/dashboard/requisitions/${res.id}`)
   }
@@ -140,7 +175,7 @@ export function RequisitionForm({ onSuccess }: RequisitionFormProps) {
       <div className="flex justify-end gap-2 pt-2">
         <Button type="submit" disabled={saving}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {saving ? 'Creating…' : 'Create Requisition'}
+          {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Requisition'}
         </Button>
       </div>
     </form>
