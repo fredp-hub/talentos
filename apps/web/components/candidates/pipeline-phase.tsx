@@ -6,6 +6,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { outreachFromPhase } from '@/lib/status-sync'
 
 export type PipelinePhase =
   | 'new' | 'screening' | 'awaiting_survey' | 'survey_complete'
@@ -51,7 +52,10 @@ export function PhaseControl({ candidateId, phase }: { candidateId: string; phas
   const update = async (v: string) => {
     setValue(v)
     setSaving(true)
-    await (supabase as any).from('candidates').update({ pipeline_phase: v }).eq('id', candidateId)
+    await (supabase as any)
+      .from('candidates')
+      .update({ pipeline_phase: v, outreach_status: outreachFromPhase(v) })
+      .eq('id', candidateId)
     setSaving(false)
   }
 

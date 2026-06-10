@@ -70,10 +70,10 @@ export async function generateAndLogOutreach(
 
   if (logErr) throw new Error(`Failed to log outreach: ${logErr.message}`)
 
-  // Update candidate outreach_status
+  // Update candidate outreach_status (+ matching pipeline phase)
   await (supabase as any)
     .from('candidates')
-    .update({ outreach_status: 'outreach_sent' })
+    .update({ outreach_status: 'outreach_sent', pipeline_phase: 'screening' })
     .eq('id', params.candidateId)
     .eq('outreach_status', 'not_contacted') // only advance if still pristine
 

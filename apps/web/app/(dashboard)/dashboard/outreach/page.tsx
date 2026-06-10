@@ -27,6 +27,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Loader2, Copy, Send, Link2, RefreshCw, Users, Mail, CheckCircle2, TrendingUp } from 'lucide-react'
+import { phaseFromOutreach } from '@/lib/status-sync'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -213,7 +214,10 @@ export default function OutreachPage() {
   const updateStatus = async (candidateId: string, status: OutreachStatus) => {
     // optimistic
     setCandidates((prev) => prev.map((c) => (c.id === candidateId ? { ...c, outreach_status: status } : c)))
-    await (supabase as any).from('candidates').update({ outreach_status: status }).eq('id', candidateId)
+    await (supabase as any)
+      .from('candidates')
+      .update({ outreach_status: status, pipeline_phase: phaseFromOutreach(status) })
+      .eq('id', candidateId)
     // log the activity
     await (supabase as any).from('outreach_log').insert({
       candidate_id: candidateId,

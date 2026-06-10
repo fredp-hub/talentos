@@ -56,6 +56,13 @@ export async function POST(request: NextRequest) {
 
   if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
 
+  // Move the candidate to "awaiting survey" in both trackers (only forward from early phases)
+  await (admin as any)
+    .from('candidates')
+    .update({ pipeline_phase: 'awaiting_survey', outreach_status: 'stage2_started' })
+    .eq('id', candidateId)
+    .in('pipeline_phase', ['new', 'screening'])
+
   // Generate the public token + link
   const token = await generateIntakeToken(candidateId)
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'

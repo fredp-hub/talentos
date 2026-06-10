@@ -39,11 +39,11 @@ export async function POST(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // If this is an interview note, advance the pipeline phase
+  // If this is an interview note, advance the pipeline phase (+ keep outreach funnel in sync)
   if (note_type === 'interview' || note_type === 'screen') {
     await (admin as any)
       .from('candidates')
-      .update({ pipeline_phase: 'interview_complete' })
+      .update({ pipeline_phase: 'interview_complete', outreach_status: 'stage3_complete' })
       .eq('id', candidateId)
       .in('pipeline_phase', ['awaiting_interview', 'survey_complete', 'screening', 'new'])
   }
